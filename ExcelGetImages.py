@@ -4,11 +4,11 @@ import win32com.client as win32
 import os
 
 excel = win32.gencache.EnsureDispatch('Excel.Application')
-workbook = excel.Workbooks.Open(r'C:\Users\Gio\Desktop\t\t1.xls')
+workbook = excel.Workbooks.Open(r'C:\Users\Gio\Desktop\Gulisa-Input-Excell\1.xls')
 
 list = []
 
-parent_dir = "C:/Users/Gio/Desktop/Gulisa"
+parent_dir = "C:/Users/Gio/Desktop/Gulisa-Output-Excell"
 
 for sheet in workbook.Worksheets:
     for i, shape in enumerate(sheet.Shapes):
@@ -32,12 +32,26 @@ for sheet in workbook.Worksheets:
             directory = ""
 
             if int(cellStartInt) > 0:
-                if cellStartInt < cellEndInt:
-                    for i in range(int(cellStartInt), int(cellEndInt)):
-                        directory = sheet.Cells(i, 'A')
+                try:
+                    if cellStartInt < cellEndInt:
+                        for i in range(int(cellStartInt), int(cellEndInt) + 1):
+                            directory = sheet.Cells(i, 'A')
+                            dir1 = "gio#" + str(directory)
+                            path = os.path.join(str(parent_dir), str(dir1))
+                            if (str(directory) not in list):
+                                if shape.Name.startswith('Picture'):
+                                    shape.Copy()
+                                    list.append(str(directory))
+                                    os.mkdir(path)
+                                    image = ImageGrab.grabclipboard()
+                                    img = path + "/img.JPEG"
+                                    image.save(img, 'png')
+
+                    else:
+                        directory = sheet.Cells(cellStartInt, 'A')
                         dir1 = "gio#" + str(directory)
                         path = os.path.join(str(parent_dir), str(dir1))
-                        if (str(directory) not in list):
+                        if(str(directory) not in list):
                             if shape.Name.startswith('Picture'):
                                 shape.Copy()
                                 list.append(str(directory))
@@ -45,16 +59,5 @@ for sheet in workbook.Worksheets:
                                 image = ImageGrab.grabclipboard()
                                 img = path + "/img.JPEG"
                                 image.save(img, 'png')
-
-                else:
-                    directory = sheet.Cells(cellStartInt, 'A')
-                    dir1 = "gio#" + str(directory)
-                    path = os.path.join(str(parent_dir), str(dir1))
-                    if(str(directory) not in list):
-                        if shape.Name.startswith('Picture'):
-                            shape.Copy()
-                            list.append(str(directory))
-                            os.mkdir(path)
-                            image = ImageGrab.grabclipboard()
-                            img = path + "/img.JPEG"
-                            image.save(img, 'png')
+                except:
+                    print(str(directory))
